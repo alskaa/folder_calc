@@ -1,10 +1,12 @@
 import os
+import argparse
 
 def resultInFile(name, procedure) :
 
     res = 0 if procedure == 'add' else 1
-    file = open(name, 'r')
-    numbers = file.readline().split(' ')
+
+    with open(name, 'r') as file:
+        numbers = file.readline().split(' ')
 
     if '' in numbers:
         numbers.remove('')
@@ -15,7 +17,6 @@ def resultInFile(name, procedure) :
         else:
             res+=int(number)
 
-    file.close()
     return res
 
 def resultInFolder(path, procedure = None) :
@@ -26,7 +27,7 @@ def resultInFolder(path, procedure = None) :
 
     for file in files:
 
-        if file == 'add' or file == 'mul':
+        if (file == 'add' or file == 'mul') and os.listdir(os.path.join(path, file)):
             if procedure == 'add':
                 res += resultInFolder(os.path.join(path, file), file)
             else:
@@ -37,10 +38,11 @@ def resultInFolder(path, procedure = None) :
                 res += resultInFile(os.path.join(path, file), 'add')
             else:
                 res *= resultInFile(os.path.join(path, file), 'mul')
-
     return res
 
-mainDirectory = os.getcwd()
-result = resultInFolder(mainDirectory, os.listdir(mainDirectory)[0])
-print(result)
+parser = argparse.ArgumentParser()
+parser.add_argument('folder')
+
+arguments = parser.parse_args()
+print(resultInFolder(os.getcwd(), arguments.folder))
 
